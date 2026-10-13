@@ -1,0 +1,301 @@
+/* ============================================================
+   EDIT HERE: COLOR PALETTE & ANIMATION CONTROLS
+   No build tools, libraries, or internet connection are required.
+   ============================================================ */
+:root {
+  --color-bg: #08070f;
+  --color-surface: #141021;
+  --color-purple: #a585ff;
+  --color-blue: #72b8ff;
+  --color-text: #f4f0ff;
+  --color-muted: #c0b8d4;
+  --color-line: #393049;
+  --color-shadow: #0005;
+  --glow-purple: #713dc42b;
+  --glow-blue: #276cb42b;
+
+  /* Animated background: speed, intensity, colors, and scroll movement. */
+  --gradient-purple: #6d2cbb;
+  --gradient-blue: #125db1;
+  --gradient-cyan: #24b6c7;
+  --gradient-magenta: #b43dca;
+  --gradient-amber: #bf7548;
+  /* Movement and actual color cycling have separate speeds. */
+  --gradient-duration: 9s;
+  --gradient-color-duration: 12s;
+  --gradient-hue-shift: 75deg;
+  --gradient-opacity: .85;
+  --gradient-drift-x: 12%;
+  --gradient-drift-y: 9%;
+  --gradient-scroll-x: 160px;
+  --gradient-scroll-y: 100px;
+
+  /* Cursor trail: soft colored light blooms, never a line or hard dots.
+     Lifetime is in milliseconds; size and spacing are in pixels.
+     Trail colors automatically use the five gradient colors above. */
+  --trail-size: 14px;
+  --trail-opacity: .50;
+  --trail-lifetime: 500ms;
+  --trail-spacing: 3px;
+  --trail-max-points: 64;
+
+  /* Book-style serif fonts suited to a historical presentation.
+     Local fonts keep this template usable without an internet connection. */
+  --font-heading: 'Palatino Linotype', 'Book Antiqua', Palatino, 'Times New Roman', serif;
+  --font-body: 'Palatino Linotype', 'Book Antiqua', Palatino, Georgia, serif;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --content-width: 1180px;
+  --header-height: 76px;
+  --corner-radius: 5px;
+
+  /* Text enters at this scale and settles at 1. */
+  --text-enter-scale: 1;
+  /* Outgoing text shrinks toward this scale. Smaller = stronger shrink. */
+  --text-exit-scale: .18;
+  --text-enter-x: 24px;
+  --text-enter-y: 0px;
+  --text-exit-y: 0px;
+  --text-enter-blur: 8px;
+  --text-exit-blur: 18px;
+  /* Old words blur away by 45% of the scroll; new words begin at 45%.
+     Matching these values prevents two full paragraphs overlapping. */
+  --text-out-end: .45;
+  --text-in-start: .45;
+  /* Hold the text visible during the first part of the shrink (0–.9). */
+  --text-fade-start: .4;
+  /* Progress ranges: fraction of viewport/slide traversed (0.1–1).
+     Smaller = effect finishes earlier in the scroll. */
+  --text-enter-range: .85;
+  --text-exit-range: .9;
+
+  --image-travel-x: 180px;
+  --image-travel-y: 85px;
+  --image-enter-scale: .90;
+  --image-enter-rotation: 7deg;
+  /* 0 = pictures begin with text; .3 = pictures begin later.
+     Range: 0–.9. Changes the scroll timing, not a time delay. */
+  --image-delay: .18;
+  --image-exit-range: .8;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+a { color: inherit; text-underline-offset: .25em; }
+button { font: inherit; }
+a:focus-visible, button:focus-visible, main:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 6px; }
+::selection { background: var(--color-purple); color: var(--color-bg); }
+.skip-link { position: fixed; left: 20px; top: -100px; z-index: 20; background: var(--color-text); color: var(--color-bg); padding: 12px 18px; }
+.skip-link:focus { top: 12px; }
+
+/* One continuous background stays in place behind every transparent slide.
+   Outer movement follows scrolling; inner movement slowly drifts with time. */
+.ambient-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-bg);
+}
+.ambient-parallax {
+  position: absolute;
+  inset: -15%;
+  transform: translate3d(var(--bg-scroll-x, 0px), var(--bg-scroll-y, 0px), 0);
+}
+.ambient-drift {
+  position: absolute;
+  inset: -20%;
+  opacity: var(--gradient-opacity);
+  background:
+    radial-gradient(ellipse at 15% 25%, var(--gradient-purple), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, var(--gradient-blue), transparent 48%),
+    radial-gradient(ellipse at 70% 75%, var(--gradient-cyan), transparent 43%),
+    radial-gradient(ellipse at 25% 85%, var(--gradient-magenta), transparent 46%),
+    radial-gradient(ellipse at 90% 95%, var(--gradient-amber), transparent 35%);
+  filter: hue-rotate(0deg);
+  animation:
+    gradient-drift var(--gradient-duration) ease-in-out infinite alternate,
+    gradient-colors var(--gradient-color-duration) ease-in-out infinite;
+}
+/* Additional color fields move independently, so the colors blend and glow
+   rather than traveling as one fixed picture. */
+.ambient-drift::before, .ambient-drift::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: screen;
+  opacity: .25;
+}
+.ambient-drift::before {
+  background:
+    radial-gradient(ellipse at 65% 35%, var(--gradient-cyan), transparent 40%),
+    radial-gradient(ellipse at 35% 70%, var(--gradient-purple), transparent 45%);
+  animation: color-bloom calc(var(--gradient-duration) * 1.3) ease-in-out infinite alternate;
+}
+.ambient-drift::after {
+  background:
+    radial-gradient(ellipse at 35% 30%, var(--gradient-magenta), transparent 38%),
+    radial-gradient(ellipse at 80% 65%, var(--gradient-amber), transparent 32%);
+  animation: color-bloom calc(var(--gradient-duration) * 1.7) ease-in-out infinite alternate-reverse;
+}
+@keyframes color-bloom {
+  0% { opacity: .15; transform: translate3d(-4%, 3%, 0) scale(.95); }
+  50% { opacity: .45; transform: translate3d(4%, -5%, 0) scale(1.1); }
+  100% { opacity: .25; transform: translate3d(-2%, 5%, 0) scale(1.03); }
+}
+@keyframes gradient-drift {
+  0% { transform: translate3d(calc(-1 * var(--gradient-drift-x)), calc(-1 * var(--gradient-drift-y)), 0) rotate(-5deg) scale(1.02); }
+  50% { transform: translate3d(var(--gradient-drift-x), 0, 0) rotate(5deg) scale(1.08); }
+  100% { transform: translate3d(0, var(--gradient-drift-y), 0) rotate(-2deg) scale(1.04); }
+}
+/* Changing the hue makes color changes visible even when you're not scrolling.
+   Set --gradient-hue-shift to 0deg if you only want the colors to move. */
+@keyframes gradient-colors {
+  0%, 100% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(var(--gradient-hue-shift)); }
+}
+/* Disable the separate wide halo; the narrow colored trail supplies the light. */
+.ambient-spotlight { display: none; }
+.ambient-trail {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+.trail-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--trail-size);
+  height: var(--trail-size);
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, var(--trail-color) 0%, transparent 72%);
+  pointer-events: none;
+}
+@media (hover: none) {
+  .ambient-spotlight, .ambient-trail { display: none; }
+}
+
+.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 10; height: var(--header-height); padding: 0 clamp(20px, 4vw, 64px); display: flex; align-items: center; justify-content: space-between; gap: 16px; background: var(--color-bg); border-bottom: 1px solid var(--color-line); }
+.brand { display: flex; align-items: center; gap: 15px; text-decoration: none; font-family: var(--font-ui); font-size: .78rem; letter-spacing: .08em; }
+.brand-mark { font-family: var(--font-heading); font-size: 1.4rem; color: var(--color-purple); }
+.motion-toggle { background: transparent; color: var(--color-muted); border: 1px solid var(--color-line); border-radius: 30px; padding: 8px 13px; cursor: pointer; font-family: var(--font-ui); font-size: .7rem; }
+.motion-toggle:hover { color: var(--color-text); border-color: var(--color-purple); }
+.motion-toggle[hidden] { display: none; }
+.section-nav { position: fixed; right: 17px; top: 50%; transform: translateY(-50%); z-index: 11; display: grid; gap: 10px; }
+.section-nav a { width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid transparent; border-radius: 50%; color: var(--color-muted); font-family: var(--font-ui); font-size: .62rem; text-decoration: none; background: var(--color-bg); }
+.section-nav a:hover, .section-nav a[aria-current] { color: var(--color-blue); border-color: var(--color-blue); }
+
+/* Native scrolling supports touch, trackpad, mouse wheel and keyboard.
+   Switch mandatory to proximity for a gentler snapping behavior. */
+.presentation { position: relative; z-index: 1; height: 100vh; height: 100dvh; overflow-y: auto; overflow-x: hidden; scroll-snap-type: y mandatory; scroll-behavior: smooth; overscroll-behavior-y: contain; }
+.panel { position: relative; min-height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center; padding: calc(var(--header-height) + 48px) clamp(24px, 7vw, 112px) 35px; background: transparent; isolation: isolate; }
+.panel-layout { width: 100%; max-width: var(--content-width); margin: auto; display: grid; grid-template-columns: 1.18fr 1fr; gap: clamp(35px, 6vw, 100px); align-items: center; }
+.panel-text { position: relative; z-index: 2; min-width: 0; transform-origin: 50% 50%; }
+.eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 30px; color: var(--color-blue); font-size: .67rem; text-transform: uppercase; letter-spacing: .18em; line-height: 1.6; }
+.small-line { width: 32px; height: 1px; background: var(--color-blue); flex-shrink: 0; }
+h1, h2 { margin: 0 0 28px; font-family: var(--font-heading); font-weight: 400; line-height: 1.1; letter-spacing: -.015em; overflow-wrap: anywhere; }
+h1 { font-size: clamp(3rem, 5.4vw, 5.7rem); }
+h2 { font-size: clamp(3rem, 4.8vw, 5.2rem); }
+.accent-text { color: var(--color-purple); font-style: italic; }
+.body-copy { max-width: 48ch; font-size: clamp(1.05rem, 1.3vw, 1.18rem); line-height: 1.75; color: var(--color-muted); }
+.placeholder-copy { opacity: .95; }
+.byline { margin: 25px 0 0; color: var(--color-muted); font-size: .75rem; letter-spacing: .06em; }
+.byline span { padding: 0 9px; color: var(--color-purple); }
+.next-link { display: inline-flex; align-items: center; gap: 25px; padding: 12px 0; margin-top: 25px; font-size: .8rem; text-decoration: none; border-bottom: 1px solid var(--color-purple); }
+.next-link span { font-size: 1.4rem; color: var(--color-blue); }
+.section-category { margin: 0 0 12px; color: var(--color-muted); font-size: .8rem; }
+.detail-line { display: flex; flex-wrap: wrap; gap: 24px; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); padding: 15px 0; margin: 22px 0; color: var(--color-blue); font-size: .75rem; }
+.panel-footer { width: 100%; max-width: var(--content-width); margin: 45px auto 0; padding-top: 18px; display: flex; align-items: center; justify-content: space-between; gap: 15px; color: var(--color-muted); border-top: 1px solid var(--color-line); font-size: .6rem; letter-spacing: .12em; text-transform: uppercase; }
+
+.media { --direction: 1; --rest-rotation: 0deg; min-width: 0; margin: 0; padding: 12px; background: var(--color-surface); border: 1px solid var(--color-line); border-radius: var(--corner-radius); box-shadow: 0 18px 55px var(--color-shadow); transform: rotate(var(--rest-rotation)); }
+.media[data-side="left"] { --direction: -1; }
+.media img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; border-radius: calc(var(--corner-radius) / 2); }
+.image-placeholder { aspect-ratio: 4 / 5; padding: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; color: var(--color-muted); background: radial-gradient(ellipse at 25% 20%, var(--glow-purple), transparent 70%), radial-gradient(ellipse at 80% 85%, var(--glow-blue), transparent 70%); border: 1px dashed var(--color-line); }
+.image-symbol { color: var(--color-purple); font-family: var(--font-heading); font-size: 4.5rem; line-height: 1.2; }
+.image-placeholder > span:not(.image-symbol) { font-size: .9rem; }
+.image-placeholder small { font-size: .66rem; line-height: 1.5; }
+figcaption { margin-top: 12px; color: var(--color-muted); font-size: .63rem; line-height: 1.5; }
+.image-stack { position: relative; height: clamp(320px, 36vw, 470px); width: 100%; }
+.image-stack .media { position: absolute; width: 67%; }
+.media-back { --rest-rotation: -8deg; top: 0; left: 0; }
+.media-front { --rest-rotation: 7deg; bottom: 10px; right: 0; }
+.stack-label { position: absolute; bottom: -20px; left: 0; color: var(--color-blue); font-size: .6rem; letter-spacing: .16em; text-transform: uppercase; }
+.portrait { width: 100%; max-width: 370px; justify-self: center; }
+.landscape .image-placeholder, .landscape img { aspect-ratio: 5 / 4; }
+.panel-reverse .panel-text { grid-column: 2; grid-row: 1; }
+.panel-reverse .media { grid-column: 1; grid-row: 1; }
+.takeaways { list-style: none; padding: 0; margin: 25px 0 0; }
+.takeaways li { display: flex; gap: 24px; padding: 15px 0; border-bottom: 1px solid var(--color-line); font-size: .9rem; line-height: 1.6; }
+.takeaways span { color: var(--color-blue); font-size: .7rem; padding-top: 3px; }
+.source-list { padding-left: 20px; color: var(--color-muted); font-size: .9rem; line-height: 1.8; }
+.source-list li { padding: 12px 0 12px 8px; border-bottom: 1px solid var(--color-line); overflow-wrap: anywhere; }
+.source-list a { color: var(--color-blue); }
+.closing-mark { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--color-muted); font-family: var(--font-heading); font-size: clamp(6rem, 12vw, 11rem); }
+.closing-mark small { flex-basis: 100%; text-align: center; font-family: var(--font-body); font-size: .65rem; letter-spacing: .14em; text-transform: uppercase; }
+
+/* Scroll progress is set by script.js. The page stays readable without JS.
+   Change the formulas below if you want to create your own effects. */
+.js-motion .panel { --enter: 1; --leave: 0; --text-in: 1; --text-out: 0; --text-opacity: 1; --text-pin-y: 0px; --image-reveal: 1; --image-leave: 0; }
+.js-motion .panel-text { opacity: var(--text-opacity); filter: blur(calc(var(--leave) * var(--text-exit-blur))); }
+.js-motion [data-text-effect="blur"] .panel-text {
+  opacity: calc(var(--text-in) * (1 - var(--text-out)));
+  filter: blur(calc((1 - var(--text-in)) * var(--text-enter-blur) + var(--text-out) * var(--text-exit-blur)));
+  transform: translate3d(calc((1 - var(--text-in)) * var(--text-enter-x)), var(--text-pin-y), 0);
+}
+.js-motion [data-text-effect="zoom"] .panel-text {
+  transform: translate3d(calc((1 - var(--enter)) * var(--text-enter-x)), calc(var(--text-pin-y) + (1 - var(--enter)) * var(--text-enter-y) + var(--leave) * var(--text-exit-y)), 0) scale(calc(1 + (1 - var(--enter)) * (var(--text-enter-scale) - 1) + var(--leave) * (var(--text-exit-scale) - 1)));
+}
+.js-motion [data-text-effect="slide"] .panel-text { transform: translate3d(calc((1 - var(--enter)) * var(--text-enter-x)), calc(var(--text-pin-y) + (1 - var(--enter)) * var(--text-enter-y) + var(--leave) * var(--text-exit-y)), 0); }
+.js-motion [data-text-effect="fade"] .panel-text { transform: translateY(var(--text-pin-y)); filter: none; }
+.js-motion [data-text-effect="none"] .panel-text { opacity: 1; transform: none; filter: none; }
+.js-motion .media { opacity: calc(var(--image-reveal) * (1 - var(--image-leave))); }
+.js-motion [data-image-effect="fly"] .media {
+  transform: translateX(calc((1 - var(--image-reveal)) * var(--image-travel-x) * var(--direction))) rotate(calc(var(--rest-rotation) + (1 - var(--image-reveal)) * var(--image-enter-rotation) * var(--direction))) scale(calc(1 + (1 - var(--image-reveal)) * (var(--image-enter-scale) - 1)));
+}
+.js-motion [data-image-effect="rise"] .media { transform: translateY(calc((1 - var(--image-reveal)) * var(--image-travel-y))) rotate(var(--rest-rotation)); }
+.js-motion [data-image-effect="fade"] .media { transform: rotate(var(--rest-rotation)); }
+.js-motion [data-image-effect="none"] .media { opacity: 1; transform: rotate(var(--rest-rotation)); }
+
+@media (max-width: 760px) {
+  :root { --header-height: 64px; --image-travel-x: 85px; }
+  .site-header { padding: 0 20px; }
+  .brand { font-size: .63rem; gap: 10px; }
+  .brand-mark { font-size: 1.1rem; }
+  .motion-toggle { font-size: .62rem; padding: 7px 9px; }
+  .section-nav { top: auto; bottom: 12px; right: 50%; transform: translateX(50%); display: flex; gap: 5px; padding: 4px 8px; background: var(--color-bg); border: 1px solid var(--color-line); border-radius: 30px; }
+  .section-nav a { width: 27px; height: 27px; }
+  .panel { padding: calc(var(--header-height) + 28px) 26px 86px; }
+  .panel-layout { grid-template-columns: 1fr; gap: 35px; }
+  .eyebrow { margin-bottom: 20px; font-size: .59rem; }
+  h1 { font-size: clamp(2.85rem, 10vw, 4.8rem); }
+  h2 { font-size: clamp(2.65rem, 9vw, 4.5rem); }
+  .body-copy { font-size: 1.05rem; }
+  .next-link { margin-top: 12px; }
+  .image-stack { max-width: 380px; height: 325px; margin: 0 auto; }
+  .image-stack .media { width: 62%; }
+  .portrait { max-width: 260px; }
+  .landscape { width: 100%; max-width: 380px; justify-self: center; }
+  .panel-reverse .panel-text, .panel-reverse .media { grid-column: auto; grid-row: auto; }
+  .closing-mark { font-size: 6rem; padding: 10px 0; }
+  .panel-footer { margin-top: 38px; font-size: .55rem; }
+  .panel-intro .panel-footer span:nth-child(2) { display: none; }
+}
+
+/* Reduced motion keeps ordinary scrolling and a static background. */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.js-motion) .presentation { scroll-behavior: auto; scroll-snap-type: y proximity; }
+  html:not(.js-motion) .ambient-drift { animation: none; }
+  html:not(.js-motion) .ambient-drift::before, html:not(.js-motion) .ambient-drift::after { animation: none; }
+  html:not(.js-motion) .ambient-parallax { transform: none; }
+}
+.motion-reduced .ambient-drift { animation: none; }
+.motion-reduced .ambient-drift::before, .motion-reduced .ambient-drift::after { animation: none; }
+.motion-reduced .ambient-trail { display: none; }
+.motion-reduced .ambient-parallax { transform: none; }
+.motion-reduced .ambient-spotlight { transition: none; }
+.motion-reduced .presentation { scroll-behavior: auto; scroll-snap-type: y proximity; }
+.motion-reduced .panel .panel-text { opacity: 1; transform: none; filter: none; }
+.motion-reduced .panel .media { opacity: 1; transform: rotate(var(--rest-rotation)); }
