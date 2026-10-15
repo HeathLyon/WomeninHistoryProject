@@ -1,297 +1,197 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta
-            name="description"
-            content="A school presentation template about women in the Revolutionary War."
-        >
-        <title>Women in the Revolutionary War | Presentation</title>
+        <meta name="description" content="A school presentation about women in the American Revolution.">
+        <title>Women &amp; the Revolution</title>
         <link rel="stylesheet" href="styles.css">
-        <!--
-            SETUP: Copy script.txt into a new file named script.js in this same folder.
-            Then open index.html, or use VS Code's Live Server extension.
-            The .txt file is JavaScript source; do not link it as a .txt script.
-        -->
-        <script src="script.js" defer="defer"></script>
+        <!-- Save these three text files as index.html, styles.css, and script.js.
+             Replace the ENTIRE contents of the old files. No packages needed.
+             Edit the opening image playlist at the top of script.js. -->
+        <script src="script.js" defer></script>
     </head>
-
     <body>
-        <!-- The shared gradient moves with time and scrolling. -->
-        <div class="ambient-background" aria-hidden="true">
-            <div class="ambient-parallax">
-                <div class="ambient-drift"></div>
-            </div>
-            <div class="ambient-spotlight"></div>
-            <!-- JavaScript adds a bounded pool of fading gradient lights here. -->
-            <div class="ambient-trail"></div>
+        <div class="paper-background" aria-hidden="true">
+            <div class="paper-wash"></div>
+            <div class="cursor-trail"></div>
         </div>
-
         <a class="skip-link" href="#presentation">Skip to presentation</a>
+
         <header class="site-header">
             <a class="brand" href="#intro">
-                <span class="brand-mark" aria-hidden="true">W / R</span> <span>Women &amp; Revolution</span>
+                <span class="brand-seal" aria-hidden="true">W<span>✦</span>R</span>
+                <span>Women &amp; the Revolution</span>
             </a>
-            <button class="motion-toggle" type="button" aria-pressed="false" hidden>
-                Reduce motion
-            </button>
+            <div class="header-actions">
+                <span class="header-note">A history presentation</span>
+                <button class="motion-toggle" type="button" aria-pressed="false" hidden>
+                    Reduce motion
+                </button>
+            </div>
         </header>
 
-        <nav class="section-nav" aria-label="Presentation sections">
-            <a href="#intro" aria-label="01 Introduction" aria-current="location"><span>01</span></a>
-            <a href="#woman-one" aria-label="02 First woman"><span>02</span></a>
-            <a href="#woman-two" aria-label="03 Second woman"><span>03</span></a>
-            <a href="#impact" aria-label="04 Impact"><span>04</span></a>
-            <a href="#sources" aria-label="05 Sources"><span>05</span></a>
+        <nav class="section-nav" aria-label="Presentation chapters">
+            <a href="#intro" aria-label="01 Introduction" aria-current="location">01</a>
+            <a href="#woman-one" aria-label="02 First story">02</a>
+            <a href="#woman-two" aria-label="03 Second story">03</a>
+            <a href="#impact" aria-label="04 Impact">04</a>
+            <a href="#sources" aria-label="05 Sources">05</a>
         </nav>
 
-        <!--
-            ADD A SLIDE: Duplicate a .panel section, give it a unique id, and add a
-            matching link above. Every slide must keep one .panel-text wrapper.
-            Per-slide effects: data-text-effect="blur|zoom|fade|slide|none"
-            data-image-effect="fly|rise|fade|none"
-            Per-picture direction: data-side="left|right". All colors and animation
-            amounts live in :root at the top of styles.css.
-        -->
-        <main
-            id="presentation"
-            class="presentation"
-            tabindex="0"
-            aria-label="Scrollable school presentation"
-        >
-            <section
-                class="panel panel-intro"
-                id="intro"
-                aria-labelledby="intro-title"
-                data-text-effect="blur"
-                data-image-effect="fly"
-            >
-                <div class="panel-layout">
-                    <div class="panel-text">
-                        <p class="eyebrow">
-                            <span class="small-line" aria-hidden="true"></span> A school presentation / 01
-                        </p>
-                        <h1 id="intro-title">
-                            Women in the <span class="accent-text">Revolutionary</span> War.
-                        </h1>
-                        <p class="body-copy placeholder-copy">
-                            [Add your introduction here. Explain the focus of your project in two or
-                            three sentences.]
-                        </p>
-                        <p class="byline">
-                            [Your names] <span aria-hidden="true">/</span> [Class &amp; date]
-                        </p>
-                        <a class="next-link" href="#woman-one">
-                            Explore the stories <span aria-hidden="true">↘</span>
-                        </a>
-                    </div>
-                    <div class="image-stack" aria-label="Image placeholders">
-                        <figure class="media media-back" data-side="left">
-                            <div class="image-placeholder">
-                                <span class="image-symbol" aria-hidden="true">✦</span>
-                                <span>Supporting image</span>
-                                <small>[Map, letter, or illustration]</small>
-                            </div>
-                            <!--
-                                Replace the .image-placeholder div with:
-                                <img src="images/your-image.jpg" alt="Describe the image here" width="800" height="1000">
-                                Keep the .media figure wrapper so the animation still works.
-                            -->
-                            <figcaption>[Image credit]</figcaption>
-                        </figure>
-                        <figure class="media media-front" data-side="right">
-                            <div class="image-placeholder">
-                                <span class="image-symbol" aria-hidden="true">✧</span>
-                                <span>Cover image</span>
-                                <small>[Portrait or historic artwork]</small>
-                            </div>
-                            <figcaption>[Image credit]</figcaption>
-                        </figure>
-                        <span class="stack-label" aria-hidden="true">Voices / Courage / Change</span>
+        <main id="presentation" class="presentation" tabindex="0" aria-label="Scrollable presentation">
+            <!-- OPENING: the playlist in script.js builds the slideshow here.
+                 This first image also appears with JavaScript disabled.
+                 Demo artwork uses remote URLs. For offline use, download your
+                 images into an images folder and edit IMAGE_PLAYLIST. -->
+            <section class="panel hero" id="intro" aria-labelledby="intro-title">
+                <div class="hero-slides" aria-hidden="true">
+                    <div class="hero-slide is-current">
+                        <img
+                            src="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Declaration_of_Independence_%281819%29%2C_by_John_Trumbull.jpg/1280px-Declaration_of_Independence_%281819%29%2C_by_John_Trumbull.jpg"
+                            alt=""
+                            fetchpriority="high"
+                        >
                     </div>
                 </div>
-                <div class="panel-footer">
-                    <span>Introduction</span>
-                    <span>Scroll to continue ↓</span>
-                    <span>01 / 05</span>
+                <div class="hero-tint" aria-hidden="true"></div>
+                <div class="panel-layout hero-layout">
+                    <div class="panel-text hero-copy">
+                        <p class="eyebrow">A school presentation <span aria-hidden="true">✦</span> Chapter I</p>
+                        <h1 id="intro-title">Women of<br>the <em>Revolution.</em></h1>
+                        <div class="title-rule" aria-hidden="true"><span>✦</span></div>
+                        <p class="body-copy">
+                            [Add your introduction here. What stories will your presentation explore?]
+                        </p>
+                        <p class="byline">[Your names] <span aria-hidden="true">/</span> [Class &amp; date]</p>
+                        <a class="next-link" href="#woman-one">Explore their stories <span aria-hidden="true">↘</span></a>
+                    </div>
+                </div>
+                <div class="hero-bottom">
+                    <div class="slide-meta">
+                        <span class="slide-number">01 / 03</span>
+                        <a class="slide-credit" href="https://commons.wikimedia.org/wiki/File:Declaration_of_Independence_(1819),_by_John_Trumbull.jpg" target="_blank" rel="noopener noreferrer">
+                            Declaration of Independence — John Trumbull
+                        </a>
+                    </div>
+                    <div class="slideshow-controls" aria-label="Opening slideshow controls" hidden>
+                        <button class="slide-prev" type="button" aria-label="Previous image">←</button>
+                        <button class="slide-pause" type="button" aria-pressed="false">Pause slideshow</button>
+                        <button class="slide-next" type="button" aria-label="Next image">→</button>
+                    </div>
+                    <span class="scroll-hint">Scroll to begin ↓</span>
                 </div>
             </section>
 
-            <section
-                class="panel"
-                id="woman-one"
-                aria-labelledby="woman-one-title"
-                data-text-effect="blur"
-                data-image-effect="fly"
-            >
+            <!-- ADD A CHAPTER: duplicate a section below and give it a unique
+                 id, heading id, and matching navigation link above.
+                 Pictures: data-side="left" or "right" controls the fly-in.
+                 Change distances, exit scale, timing and colors in CSS :root.
+                 Keep .panel-text and .media wrappers for the scroll effects. -->
+            <section class="panel" id="woman-one" aria-labelledby="one-title">
                 <div class="panel-layout">
                     <div class="panel-text">
-                        <p class="eyebrow">
-                            <span class="small-line" aria-hidden="true"></span> The first story / 02
-                        </p>
-                        <p class="section-category">[Role or theme]</p>
-                        <h2 id="woman-one-title">[Woman’s <span class="accent-text">name]</span></h2>
-                        <p class="body-copy placeholder-copy">
-                            [Introduce her here. Who was she, and what part did she play in the
-                            Revolutionary War?]
-                        </p>
-                        <div class="detail-line">
-                            <span>[Dates]</span>
-                            <span>[Location]</span>
-                        </div>
-                        <p class="body-copy placeholder-copy">
-                            [Add one important action, event, or detail. Include a citation to your
-                            source.]
-                        </p>
-                        <a class="next-link" href="#woman-two">
-                            Next story <span aria-hidden="true">↘</span>
-                        </a>
+                        <p class="eyebrow">Chapter II <span aria-hidden="true">✦</span> The first story</p>
+                        <p class="section-category">[Her role or contribution]</p>
+                        <h2 id="one-title">[Woman’s <em>name]</em></h2>
+                        <div class="title-rule" aria-hidden="true"><span>✦</span></div>
+                        <p class="body-copy">[Introduce her. Who was she, and what part did she play in the Revolutionary War?]</p>
+                        <div class="detail-line"><span>[Dates]</span><span>[Location]</span></div>
+                        <p class="body-copy">[Add a key action or event. Include a citation for your research.]</p>
+                        <a class="next-link" href="#woman-two">The next story <span aria-hidden="true">↘</span></a>
                     </div>
-                    <figure class="media portrait" data-side="right">
+                    <figure class="media" data-side="right">
                         <div class="image-placeholder">
-                            <span class="image-symbol" aria-hidden="true">✦</span>
-                            <span>Portrait goes here</span>
-                            <small>[Replace with your first image]</small>
+                            <span class="placeholder-star" aria-hidden="true">✦</span>
+                            <span>Your first portrait</span>
+                            <small>[Replace this box with an image]</small>
                         </div>
-                        <figcaption>[Image caption / source / credit]</figcaption>
+                        <!-- Replace only the .image-placeholder div with:
+                        <img src="images/first-woman.jpg" alt="Describe the portrait" width="800" height="1000">
+                        Keep this figure and its data-side attribute. -->
+                        <figcaption>[Image title / artist / credit]</figcaption>
                     </figure>
                 </div>
-                <div class="panel-footer">
-                    <span>First woman</span>
-                    <span>02 / 05</span>
-                </div>
+                <div class="panel-footer"><span>First story</span><span>02 / 05</span></div>
             </section>
 
-            <section
-                class="panel panel-reverse"
-                id="woman-two"
-                aria-labelledby="woman-two-title"
-                data-text-effect="blur"
-                data-image-effect="fly"
-            >
+            <section class="panel panel-reverse" id="woman-two" aria-labelledby="two-title">
                 <div class="panel-layout">
                     <div class="panel-text">
-                        <p class="eyebrow">
-                            <span class="small-line" aria-hidden="true"></span> The second story / 03
-                        </p>
-                        <p class="section-category">[Role or theme]</p>
-                        <h2 id="woman-two-title">[Woman’s <span class="accent-text">name]</span></h2>
-                        <p class="body-copy placeholder-copy">
-                            [Introduce the next woman. What makes her story worth sharing?]
-                        </p>
-                        <div class="detail-line">
-                            <span>[Dates]</span>
-                            <span>[Location]</span>
-                        </div>
-                        <p class="body-copy placeholder-copy">
-                            [Add a key contribution or turning point. Include a citation to your source.]
-                        </p>
-                        <a class="next-link" href="#impact">
-                            Explore their impact <span aria-hidden="true">↘</span>
-                        </a>
+                        <p class="eyebrow">Chapter III <span aria-hidden="true">✦</span> The second story</p>
+                        <p class="section-category">[Her role or contribution]</p>
+                        <h2 id="two-title">[Woman’s <em>name]</em></h2>
+                        <div class="title-rule" aria-hidden="true"><span>✦</span></div>
+                        <p class="body-copy">[Introduce the next woman. What makes her story worth sharing?]</p>
+                        <div class="detail-line"><span>[Dates]</span><span>[Location]</span></div>
+                        <p class="body-copy">[Describe a contribution or turning point. Include a citation.]</p>
+                        <a class="next-link" href="#impact">Their impact <span aria-hidden="true">↘</span></a>
                     </div>
-                    <figure class="media portrait" data-side="left">
+                    <figure class="media" data-side="left">
                         <div class="image-placeholder">
-                            <span class="image-symbol" aria-hidden="true">✧</span>
-                            <span>Portrait goes here</span>
-                            <small>[Replace with your second image]</small>
+                            <span class="placeholder-star" aria-hidden="true">✦</span>
+                            <span>Your second portrait</span>
+                            <small>[Replace this box with an image]</small>
                         </div>
-                        <figcaption>[Image caption / source / credit]</figcaption>
+                        <figcaption>[Image title / artist / credit]</figcaption>
                     </figure>
                 </div>
-                <div class="panel-footer">
-                    <span>Second woman</span>
-                    <span>03 / 05</span>
-                </div>
+                <div class="panel-footer"><span>Second story</span><span>03 / 05</span></div>
             </section>
 
-            <section
-                class="panel"
-                id="impact"
-                aria-labelledby="impact-title"
-                data-text-effect="blur"
-                data-image-effect="fly"
-            >
+            <section class="panel" id="impact" aria-labelledby="impact-title">
                 <div class="panel-layout">
                     <div class="panel-text">
-                        <p class="eyebrow">
-                            <span class="small-line" aria-hidden="true"></span> The bigger picture / 04
-                        </p>
-                        <h2 id="impact-title">Their <span class="accent-text">impact.</span></h2>
-                        <p class="body-copy placeholder-copy">
-                            [Explain how these women influenced events and what their stories help us
-                            understand.]
-                        </p>
-                        <ul class="takeaways">
-                            <li><span>01</span> [Your first takeaway]</li>
-                            <li><span>02</span> [Your second takeaway]</li>
-                            <li><span>03</span> [Your third takeaway]</li>
-                        </ul>
-                        <a class="next-link" href="#sources">
-                            View sources <span aria-hidden="true">↘</span>
-                        </a>
+                        <p class="eyebrow">Chapter IV <span aria-hidden="true">✦</span> Impact &amp; legacy</p>
+                        <h2 id="impact-title">A lasting <em>impression.</em></h2>
+                        <div class="title-rule" aria-hidden="true"><span>✦</span></div>
+                        <p class="body-copy">[Explain what these women’s stories reveal about the Revolution.]</p>
+                        <ol class="takeaways">
+                            <li>[Your first takeaway]</li>
+                            <li>[Your second takeaway]</li>
+                            <li>[Your third takeaway]</li>
+                        </ol>
+                        <a class="next-link" href="#sources">Read the sources <span aria-hidden="true">↘</span></a>
                     </div>
-                    <figure class="media landscape" data-side="right">
+                    <figure class="media media-landscape" data-side="right">
                         <div class="image-placeholder">
-                            <span class="image-symbol" aria-hidden="true">✦</span>
-                            <span>Context image</span>
-                            <small>[Artwork, map, or document]</small>
+                            <span class="placeholder-star" aria-hidden="true">✦</span>
+                            <span>A letter, map, or illustration</span>
+                            <small>[Add a supporting image]</small>
                         </div>
-                        <figcaption>[Image caption / source / credit]</figcaption>
+                        <figcaption>[Image title / artist / credit]</figcaption>
                     </figure>
                 </div>
-                <div class="panel-footer">
-                    <span>Impact &amp; legacy</span>
-                    <span>04 / 05</span>
-                </div>
+                <div class="panel-footer"><span>Impact &amp; legacy</span><span>04 / 05</span></div>
             </section>
 
-            <section
-                class="panel panel-sources"
-                id="sources"
-                aria-labelledby="sources-title"
-                data-text-effect="blur"
-                data-image-effect="none"
-            >
+            <section class="panel panel-sources" id="sources" aria-labelledby="sources-title">
                 <div class="panel-layout">
                     <div class="panel-text">
-                        <p class="eyebrow">
-                            <span class="small-line" aria-hidden="true"></span> The research / 05
-                        </p>
-                        <h2 id="sources-title">
-                            Sources &amp; <span class="accent-text">credits.</span>
-                        </h2>
-                        <p class="body-copy placeholder-copy">
-                            [List the books, archives, websites, and image sources you used. Follow your
-                            teacher’s citation format.]
-                        </p>
-                        <!--
-                            Replace each placeholder with a citation. Example link syntax:
-                            <a href="https://your-source-url.example">Author — Title</a>
-                        -->
+                        <p class="eyebrow">Chapter V <span aria-hidden="true">✦</span> The research</p>
+                        <h2 id="sources-title">Sources &amp; <em>credits.</em></h2>
+                        <div class="title-rule" aria-hidden="true"><span>✦</span></div>
+                        <p class="body-copy">[Add your research citations here in the format your teacher requires.]</p>
                         <ol class="source-list">
                             <li>[Author / title / publication / date / URL]</li>
                             <li>[Author / title / publication / date / URL]</li>
-                            <li>[Image credits and usage information]</li>
                         </ol>
-                        <a class="next-link" href="#intro">
-                            Back to the beginning <span aria-hidden="true">↗</span>
-                        </a>
+                        <details class="image-credits">
+                            <summary>Opening slideshow artwork credits</summary>
+                            <p>Replace these credits if you replace the demo playlist.</p>
+                            <ul>
+                                <li><a href="https://commons.wikimedia.org/wiki/File:Declaration_of_Independence_(1819),_by_John_Trumbull.jpg">Declaration of Independence — John Trumbull, 1819.</a> A later artistic depiction.</li>
+                                <li><a href="https://commons.wikimedia.org/wiki/File:Abigail_Adams_by_Gilbert_Stuart.jpg">Abigail Smith Adams — Gilbert Stuart, begun 1800, delivered 1815.</a></li>
+                                <li><a href="https://commons.wikimedia.org/wiki/File:Mercy_Otis_Warren.jpg">Mercy Otis Warren — John Singleton Copley, circa 1763.</a></li>
+                            </ul>
+                            <p>These artwork reproductions are marked public domain on their source pages.</p>
+                        </details>
+                        <a class="next-link" href="#intro">Return to the beginning <span aria-hidden="true">↗</span></a>
                     </div>
-                    <div class="closing-mark" aria-hidden="true">
-                        <span>W</span>
-                        <span class="accent-text">/</span>
-                        <span>R</span>
-                        <small>Your research. Their stories.</small>
-                    </div>
+                    <div class="closing-seal" aria-hidden="true"><span>W ✦ R</span><small>Women &amp; the Revolution</small></div>
                 </div>
-                <div class="panel-footer">
-                    <span>[Project names]</span>
-                    <span>05 / 05</span>
-                </div>
+                <div class="panel-footer"><span>[Your project names]</span><span>05 / 05</span></div>
             </section>
-
         </main>
     </body>
 </html>
