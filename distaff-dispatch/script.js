@@ -154,7 +154,7 @@
   "sources.seal_caption": "The Distaff Dispatch",
   "sources.footer": "The end of this issue"
 };
-    const config = Object.assign({ appsScriptUrl: '', refreshSeconds: 300 }, window.DISPATCH_CONFIG || {});
+    const config = Object.assign({ publishedDocUrl: '', appsScriptUrl: '', refreshSeconds: 300 }, window.DISPATCH_CONFIG || {});
     let current = { ...DEFAULTS };
     let busy = false;
     let lastAttempt = 0;
@@ -229,14 +229,44 @@
         document.dispatchEvent(new CustomEvent('dispatch:content'));
     }
 
+    function extractPublishedText(markup) {
+        if (typeof markup !== 'string' || markup.length > 2000000) throw new Error('Invalid or oversized published document.');
+        // Parse an inert document. Never insert Google's markup into the live page.
+        const published = new DOMParser().parseFromString(markup, 'text/html');
+        const content = published.getElementById('contents');
+        if (!content) throw new Error('This response does not contain a published Google Doc.');
+        const parts = [];
+        const blocks = new Set(['P', 'DIV', 'LI', 'TR', 'TD', 'TH', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'PRE', 'BLOCKQUOTE']);
+        const skip = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE']);
+        function walk(node) {
+            if (node.nodeType === 3) { parts.push(node.nodeValue || ''); return; }
+            if (node.nodeType !== 1 || skip.has(node.tagName)) return;
+            if (node.tagName === 'BR') { parts.push('\n'); return; }
+            node.childNodes.forEach(walk);
+            if (blocks.has(node.tagName)) parts.push('\n');
+        }
+        walk(content);
+        return parts.join('').replace(/\u00a0/g, ' ').replace(/\r\n?/g, '\n');
+    }
+
     window.DispatchContent = Object.freeze({
         get: key => current[key] ?? '',
         parse,
         apply,
-        safeURL
+        safeURL,
+        extractPublishedText
     });
 
     function endpoint() {
+        if (config.publishedDocUrl) {
+            const url = new URL(config.publishedDocUrl);
+            if (url.protocol !== 'https:' || url.hostname !== 'docs.google.com' ||
+                !/^\/document\/d\/e\/[A-Za-z0-9_-]+\/pub\/?$/.test(url.pathname) || url.username || url.password) {
+                throw new Error('publishedDocUrl must be the Google Docs Publish to web URL ending in /pub.');
+            }
+            url.hash = '';
+            return { type: 'published', url };
+        }
         if (!config.appsScriptUrl) return null;
         const url = new URL(config.appsScriptUrl);
         if (url.protocol !== 'https:' || url.hostname !== 'script.google.com' ||
@@ -244,7 +274,15 @@
             throw new Error('appsScriptUrl must be the Google Apps Script deployed web app URL ending in /exec.');
         }
         url.hash = '';
-        return url;
+        return { type: 'apps-script', url };
+    }
+
+    async function requestPublishedDoc(url) {
+        const response = await fetch(url.href, {
+            mode: 'cors', credentials: 'omit', cache: 'no-store', signal: AbortSignal.timeout(20000)
+        });
+        if (!response.ok) throw new Error('Published Google Doc returned ' + response.status);
+        return { ok: true, text: extractPublishedText(await response.text()) };
     }
 
     function requestFeed(url) {
@@ -288,11 +326,11 @@
                 apply(parse(await response.text()));
             } catch (error) { console.warn('Using the built-in gazette text.', error.message); }
         }
-        let url;
-        try { url = endpoint(); }
+        let feed;
+        try { feed = endpoint(); }
         catch (error) { console.warn(error.message); return; }
-        if (!url) return;
-        const cacheKey = 'distaff:feed:' + url.origin + url.pathname;
+        if (!feed) return;
+        const cacheKey = 'distaff:feed:' + feed.url.origin + feed.url.pathname;
         try {
             const saved = localStorage.getItem(cacheKey);
             if (saved) apply(parse(saved));
@@ -302,7 +340,9 @@
             busy = true;
             lastAttempt = Date.now();
             try {
-                const payload = await requestFeed(url);
+                const payload = feed.type === 'published'
+                    ? await requestPublishedDoc(feed.url)
+                    : await requestFeed(feed.url);
                 const fields = parse(payload.text);
                 apply(fields);
                 try { localStorage.setItem(cacheKey, payload.text); } catch (_) {}

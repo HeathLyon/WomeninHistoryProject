@@ -7,10 +7,10 @@ index.html          The complete webpage, readable even if scripts cannot run.
 styles.css          Your original rose/red/navy theme and animation styles,
                     with small additions for articles, notes, and long text.
 script.js           Your original scrolling, cursor trail, and Ken Burns effects,
-                    plus the text reader and optional Google Docs connection.
-content.txt         All 150 editable text fields. Start editing here.
-site-config.js      The one-time Google Docs connection setting.
-google-doc-feed.gs  The small Google Apps Script that reads the Google Doc.
+                    plus the text reader and configured Google Docs connection.
+content.txt         A backup/template containing all 150 editable text fields.
+site-config.js      Already connected to your published Google Doc.
+google-doc-feed.gs  Optional alternate connection; not needed for this Doc.
 README.txt          These instructions.
 
 The fictional reporter is Eleanor Hartwell. She writes as though living in 1776.
@@ -18,78 +18,79 @@ The historical subjects are Abigail Adams, Mercy Otis Warren, and Phillis Wheatl
 Ruth Whitcomb is a fictional print-shop worker. Her story is clearly labeled.
 Sources and later artwork dates appear in the final section of the website.
 
-QUICK START: TEXT FILE ONLY
+YOUR GOOGLE DOC IS CONNECTED
 
-1. Keep index.html, styles.css, script.js, site-config.js, and content.txt together.
-2. Upload that folder to any ordinary static website host.
-3. Edit content.txt in a plain-text editor. Upload the changed content.txt and
-   reload the website. You do not need to edit the HTML, CSS, or animation code.
+The website now reads this published Google Doc directly:
+https://docs.google.com/document/d/e/2PACX-1vSkV_52Rs1qEsfKcILnyPyM5oFEhFvs15VZAfeozztx8Ugp2ZCsK7UdvEvIo8IOjcFyT6HcCthivHdg/pub
 
-Opening index.html directly by double-clicking shows the built-in issue and
-animations. Browsers normally block reading a neighboring .txt file in this
-mode. Use a web host to see changes from content.txt.
+No Apps Script setup is needed for this document.
 
-Use UTF-8 when saving. The portrait and slideshow images are hosted externally
-on Wikimedia Commons and need an internet connection. If an image cannot load,
-the page retains a styled background or nameplate. You may download the credited
-images yourself, put them in an images folder, and update the corresponding
-image paths in index.html and IMAGE_PLAYLIST near the end of script.js.
+1. Open the ORIGINAL Google Doc in its normal editing view. The published /pub
+   link above is a read-only view; it is not the link your friend edits.
+2. Give your friend Editor access to the original Google Doc.
+3. Change the words BELOW each [[label]]. Keep the labels exactly as written.
+4. Let Google Docs finish saving. In File > Share > Publish to web > Published
+   content & settings, keep "Automatically republish when changes are made"
+   turned on.
+5. Reload the website after Google republishes. It also checks once each minute
+   while the page is visible. Google can take several minutes to update the
+   published version, so the entire process is not instantaneous.
 
-ONE-TIME GOOGLE DOCS SETUP
+The website extracts only the document text; Google Docs formatting and markup
+are not inserted into the page. Its colors, layout, and animations stay intact.
+The document includes all 150 editable fields and currently matches the bundled
+issue. The original Doc has not been edited on your behalf.
 
-This connection lets your friend edit the Google Doc, save normally, and see
-changes on the hosted website. She will not need to edit code for later changes.
+USING THE DOWNLOAD ON YOUR OWN HOST
 
-1. Make a new Google Doc. Copy the ENTIRE contents of content.txt into its FIRST
-   document tab. Keep every [[label]], including labels for links and buttons.
-   Use ordinary paragraphs, not tables. Do not split the text among Doc tabs.
+Keep index.html, styles.css, script.js, site-config.js, and content.txt together.
+Upload that folder to an ordinary static host. The supplied site-config.js
+already contains your published Doc link, so later Doc edits need no re-upload.
 
-2. Share the Doc with your friend as an EDITOR. The feed you deploy below will
-   make this first tab's full text publicly readable. Do not include private
-   notes in that tab. You do not have to enable public editing of the Doc.
+Your host must allow requests to https://docs.google.com. Direct cross-origin
+reading was verified for the provided Site origin. If another host's content
+security policy blocks it, allow that source in connect-src or use the optional
+Apps Script method below. Local double-click/file previews are best treated as
+built-in snapshots; use a hosted page for reliable external content loading.
 
-3. From that Google Doc, open Extensions > Apps Script. Replace the sample
-   code with the complete contents of google-doc-feed.gs.
+The portrait and slideshow images are hosted on Wikimedia Commons and require
+an internet connection. If one fails, a styled background or nameplate remains.
+Use UTF-8 when saving files.
 
-4. Set DOCUMENT_ID at the top of that script. Find the ID in the Doc's URL:
+USING ONLY CONTENT.TXT
 
-   https://docs.google.com/document/d/THE_DOCUMENT_ID_IS_HERE/edit
+Set publishedDocUrl AND appsScriptUrl to empty strings in site-config.js. Upload
+that file. Then edit content.txt in a plain-text editor, upload it, and reload
+the hosted page. A neighboring .txt file usually cannot be fetched when opening
+index.html by double-clicking from your computer.
 
-   Paste only that ID between the single quotes. Do not paste the entire URL.
-   Save the script. In the function selector, choose testConnection and click
-   Run. Authorize the script under the Google account that can read the Doc.
-   A successful test prints the number of characters read.
+OPTIONAL: CONNECT A DIFFERENT GOOGLE DOC
 
-5. Choose Deploy > New deployment. Select Web app.
-   Execute as: Me (the account that can read the Doc).
-   Who has access: Anyone.
-   Deploy and copy the WEB APP URL ending in /exec.
-   Some school/work accounts restrict anonymous Apps Script web apps; use an
-   account that permits the setting or ask that account's administrator.
+1. Copy all of content.txt into one Google Doc, keeping each label on its own
+   line. Keep all website fields in one published document tab.
+2. Choose File > Share > Publish to web, publish the Doc, and keep automatic
+   republishing enabled. Copy the URL ending in /pub.
+3. Replace publishedDocUrl in site-config.js with that /pub URL and upload the
+   changed config. A normal /edit sharing link will not work as the content URL.
 
-6. Open site-config.js in a text editor. Paste that deployed WEB APP URL into
-   appsScriptUrl. The result will have this shape:
+OPTIONAL: APPS SCRIPT ALTERNATIVE
 
-   window.DISPATCH_CONFIG = {
-       appsScriptUrl: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
-       refreshSeconds: 300
-   };
+This method is included for hosts that cannot load the published document
+URL directly. It is not required for the already connected Site.
 
-   Use the URL returned by Google. A docs.google.com editing link, a published
-   document link, or a test deployment URL ending in /dev will not work here.
+1. In the original Google Doc, open Extensions > Apps Script. Paste the complete
+   contents of google-doc-feed.gs into the script editor.
+2. Set DOCUMENT_ID to the ID in the NORMAL editing URL between /d/ and /edit.
+   A published ID beginning 2PACX is different and cannot be used for openById.
+3. Save, choose testConnection, Run, and authorize the account that reads the Doc.
+4. Deploy > New deployment > Web app. Execute as Me; Who has access: Anyone.
+   Copy the deployed web app URL ending in /exec.
+5. In site-config.js, leave publishedDocUrl blank and put the /exec URL into
+   appsScriptUrl. Upload the config. The first Doc tab becomes a public read-only
+   text feed. Later text edits need no script deployment; code changes do.
 
-7. Upload the changed site-config.js beside the other website files and reload.
-   The site requests the Doc when it opens and every five minutes while visible.
-   Reloading asks for a fresh copy immediately. Google saving/propagation and
-   network delays can add time. Later edits to the Doc need no website re-upload
-   and no script re-deployment. Changes to the Apps Script CODE itself do require
-   an updated deployment version.
-
-8. Test with one headline: change the words under [[hero.title]] in the Doc,
-   wait for Google Docs to finish saving, then reload the website.
-
-The provided website has an EMPTY appsScriptUrl until you complete these steps.
-No Google Doc has been created, connected, or deployed on your behalf.
+Some school/work accounts restrict anonymous publishing or Apps Script web
+apps. Those account restrictions need to be resolved by their administrator.
 
 HOW TO EDIT THE TEXT
 
@@ -141,30 +142,33 @@ site.brand and sources.seal_caption too when you want those to match.
 
 FALLBACKS AND TROUBLESHOOTING
 
-- If no Google feed is configured, the site reads the uploaded content.txt.
-- With a feed configured, Google Docs takes precedence over content.txt.
-- If Google is unavailable, visitors keep the last successfully loaded issue
-  cached in that browser; a first-time visitor sees the bundled text.
-- Missing labels fall back to the supplied text. Duplicated labels or missing
-  required title/introduction fields reject that update, keeping a readable page.
-- To turn off Google Docs updates, set appsScriptUrl back to an empty string,
-  upload site-config.js, and reload. To stop the public feed itself, disable its
-  deployment in Apps Script's Manage deployments.
-- If the text does not update, check Google's save status, the first Doc tab,
-  DOCUMENT_ID, the /exec URL, and deployment access set to Anyone. The browser
-  console reports connection and label errors. Never paste secrets into the Doc.
+- Source order: published Google Doc, optional Apps Script if no published URL
+  is configured, then uploaded content.txt when neither connection is configured.
+- If a configured source fails, the last readable issue stays on screen. A
+  successful Doc response is cached in that browser for future fallback; a
+  first-time visitor sees the bundled text while the Doc loads.
+- Missing labels fall back to supplied text. Repeated labels or missing required
+  title/introduction values reject the update, keeping a readable page.
+- If changes do not appear, open the /pub link first. If it still shows old text,
+  wait for Google to republish and check that automatic republishing is enabled.
+- If /pub shows the changes but the site does not, reload the site and confirm
+  that each [[label]] remains on its own line. Keep Google Docs content in the
+  tab represented by the published URL. The browser console reports any errors.
+- To stop reading Google Docs, clear both source URLs in site-config.js and
+  upload it. To stop exposing the Doc publicly, stop publishing it in Google.
 
 TECHNICAL NOTES AND REFERENCES
 
-The public feed is read-only, limited to one fixed Doc ID, and uses Google's
-documented JSONP content-service pattern to work on ordinary static hosts.
-It exposes the first Doc tab's text, including its labels and instructions.
-It has no write endpoint and never returns credentials or account information.
-The website inserts edited words as text, never arbitrary HTML, and disables
-unsafe link protocols. Google Apps Script account quotas still apply; this is
-suited to a small presentation/blog rather than a high-traffic publication.
+Published Google Docs are fetched with CORS and credentials omitted. The
+inert HTML parser reads the published content container and extracts plain
+text with paragraph boundaries, ignoring scripts and styles. Edited text is
+inserted with textContent, never arbitrary HTML; unsafe link schemes are disabled.
+The fixed configured URL is validated as a published docs.google.com document.
 
-Google documentation:
+Google publishing and automatic update documentation:
+https://support.google.com/docs/answer/183965?hl=en
+
+Optional Apps Script documentation:
 https://developers.google.com/apps-script/guides/content
 https://developers.google.com/apps-script/guides/web
 https://developers.google.com/apps-script/reference/document/document

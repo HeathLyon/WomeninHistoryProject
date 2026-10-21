@@ -4,7 +4,7 @@
  * Only the document with this fixed ID can be read. Visitors cannot choose a Doc.
  * The first document tab is published as plain text. Do not put private notes in it.
  */
-const DOCUMENT_ID = 'https://docs.google.com/document/d/e/2PACX-1vSkV_52Rs1qEsfKcILnyPyM5oFEhFvs15VZAfeozztx8Ugp2ZCsK7UdvEvIo8IOjcFyT6HcCthivHdg/pub';
+const DOCUMENT_ID = 'PASTE_YOUR_GOOGLE_DOCUMENT_ID_HERE';
 
 function readGazetteText_() {
   if (!/^[A-Za-z0-9_-]{20,}$/.test(DOCUMENT_ID) || DOCUMENT_ID.indexOf('PASTE_') === 0) {
